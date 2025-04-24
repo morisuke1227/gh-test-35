@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Image Generation</title>
+</head>
+<body>
+  <h1>AI Image Generation</h1>
+  <div>
+    <label for="inputText">Input Text:</label>
+    <input type="text" id="inputText" name="inputText">
+    <button onclick="generateImage()">Generate Image</button>
+  </div>
+
+  <div id="loadingText" style="display: none;">画像生成中...</div>
+
+  <script>
+  function generateImage() {
+    const inputText = document.getElementById('inputText').value;
+
+    document.getElementById('loadingText').style.display = 'block';
+
+    fetch('https://71yzsw3zwk.execute-api.ap-northeast-1.amazonaws.com/test-stage/', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ input_text: inputText })
+    })
+    .then(response => {
+      if (response.ok) {
+        return response.json();
+      } else {
+        throw new Error('Image generation request failed!');
+      }
+    })
+    .then(data => {
+      
+　　　 const imageUrl = JSON.parse(data.body).presigned_url;
+      displayImage(imageUrl);
+      document.getElementById('loadingText').style.display = 'none';
+
+    })
+    .catch(error => {
+      alert('API呼び出しエラー！　もう一度index.htmlを見直してみてください。');
+      console.error('Error:', error);
+      document.getElementById('loadingText').style.display = 'none';
+    });
+  }
+
+  function displayImage(url) {
+    const imageElement = document.createElement('img');
+    imageElement.src = url;
+    document.body.appendChild(imageElement);
+  }
+</script>
+</body>
+</html>
